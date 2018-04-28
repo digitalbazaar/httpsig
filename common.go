@@ -18,6 +18,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
+	"golang.org/x/crypto/ed25519"
 	"io"
 	"net/http"
 	"strings"
@@ -67,6 +68,15 @@ func BuildSignatureString(req *http.Request, headers []string) string {
 // returns []byte instead of a string.
 func BuildSignatureData(req *http.Request, headers []string) []byte {
 	return []byte(BuildSignatureString(req, headers))
+}
+
+func toEdDSAPublicKey(key interface{}) *ed25519.PublicKey {
+	switch k := key.(type) {
+	case *ed25519.PublicKey:
+		return k
+	default:
+		return nil
+	}
 }
 
 func toRSAPrivateKey(key interface{}) *rsa.PrivateKey {

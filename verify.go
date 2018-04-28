@@ -91,6 +91,13 @@ header_check:
 	}
 
 	switch params.Algorithm {
+	case "eddsa-sha512":
+		eddsa_pubkey := toEdDSAPublicKey(key)
+		valid := EdDSAVerify(eddsa_pubkey, sig_data, params.Signature)
+		if valid == true {
+			return nil
+		}
+		return fmt.Errorf("EdDSA signature verification failed")
 	case "rsa-sha1":
 		rsa_pubkey := toRSAPublicKey(key)
 		if rsa_pubkey == nil {
@@ -182,7 +189,7 @@ func getParams(req *http.Request, header, prefix string) *Params {
 func parseAlgorithm(s string) (algorithm string, ok bool) {
 	s = strings.TrimSpace(s)
 	switch s {
-	case "rsa-sha1", "rsa-sha256", "hmac-sha256":
+	case "eddsa-sha512", "rsa-sha1", "rsa-sha256", "hmac-sha256":
 		return s, true
 	}
 	return "", false
